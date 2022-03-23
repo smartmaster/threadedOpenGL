@@ -72,9 +72,7 @@ void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 	}
 
 	QMutexLocker locker{ &_renderLock };
-
 	
-
 	if (nullptr == _glctx)
 	{
 		//_glctx = new QOpenGLContext{ this };
@@ -131,8 +129,10 @@ void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 
 bool XThreadedGLWindow::event(QEvent* ev)
 {
-	++_eventCounter;
 	QEvent::Type et = ev->type();
+
+#if 0
+	++_eventCounter;
 	qDebug() << _eventCounter << ev;
 
 	switch (et)
@@ -142,6 +142,7 @@ bool XThreadedGLWindow::event(QEvent* ev)
 		qDebug() << _eventCounter << ev;
 		break;
 	}
+#endif
 
 	switch (et)
 	{
@@ -177,6 +178,7 @@ bool XThreadedGLWindow::event(QEvent* ev)
 void XThreadedGLWindow::FinalizeGL()
 {
 	QMutexLocker locker{ &_renderLock };
+
 	if (_glctx)
 	{
 		bool ok = _glctx->makeCurrent(this);
@@ -189,6 +191,8 @@ void XThreadedGLWindow::FinalizeGL()
 
 		//_glctx->deleteLater();
 		//_glctx = nullptr;
+
+		DoneCurrentCtx(_glctx);
 	}
 }
 
@@ -209,8 +213,10 @@ XThreadedGLWindow::XThreadedGLWindow(QWindow* parent)
 	_thread = new QThread{ this };
 	_renderer = new XThreadedGLWindowRenderer{ nullptr, this };
 	_renderer->moveToThread(_thread);
+
 	connect(_thread, &QThread::finished, _renderer, &QObject::deleteLater);
 	connect(this, &XThreadedGLWindow::RendererSignal, _renderer, &XThreadedGLWindowRenderer::Render);
+
 	_thread->start();
 }
 
