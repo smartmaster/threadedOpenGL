@@ -3,6 +3,8 @@
 #include "XThreadedGlWindow.h"
 #include <QMutexLocker>
 
+#define DoneCurrentCtx(glctx) glctx->doneCurrent()
+
 void XThreadedGLWindow::Render()
 {
 	if (isExposed())
@@ -12,6 +14,7 @@ void XThreadedGLWindow::Render()
 		GLPaint(_paintDev);
 		_glctx->swapBuffers(this);
 
+		DoneCurrentCtx(_glctx);
 		//if (_animating)
 		//{
 		//	requestUpdate();
@@ -45,8 +48,8 @@ void XThreadedGLWindow::paintEvent(QPaintEvent* ev)
 //}
 
 static void APIENTRY GLDebugPoc(
-	GLenum source, GLenum type, 
-	GLuint id, GLenum severity, 
+	GLenum source, GLenum type,
+	GLuint id, GLenum severity,
 	GLsizei length, const GLchar* message,
 	const void* userParam)
 {
@@ -63,7 +66,14 @@ static void APIENTRY GLDebugPoc(
 
 void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 {
+	if (_SurfaceAboutToBeDestroyed)
+	{
+		return;
+	}
+
 	QMutexLocker locker{ &_renderLock };
+
+	
 
 	if (nullptr == _glctx)
 	{
@@ -80,7 +90,7 @@ void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 
 		initializeOpenGLFunctions();
 		glDebugMessageCallback(GLDebugPoc, nullptr);
-		
+
 
 		GLInitialize();
 	}
@@ -95,6 +105,8 @@ void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 	_paintDev->setSize(ev->size() * dpr);
 
 	GLResize(ev->size(), ev->oldSize());
+
+	DoneCurrentCtx(_glctx);
 }
 
 //void XThreadedGLWindow::GLInitialize()
@@ -121,12 +133,13 @@ bool XThreadedGLWindow::event(QEvent* ev)
 {
 	++_eventCounter;
 	QEvent::Type et = ev->type();
+	qDebug() << _eventCounter << ev;
 
 	switch (et)
 	{
 	case QEvent::Paint:
 	case QEvent::Expose:
-		qDebug()  << _eventCounter  << ev;
+		qDebug() << _eventCounter << ev;
 		break;
 	}
 
@@ -136,10 +149,22 @@ bool XThreadedGLWindow::event(QEvent* ev)
 		NotifyRenderer();
 		return true;
 
-		//case QEvent::Paint:
-		//case QEvent::Expose:
-		//	Render();
-		//	return true;
+	case QEvent::PlatformSurface:
+	{
+		auto* psev = (QPlatformSurfaceEvent*)(ev);
+		if (QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed == psev->surfaceEventType())
+		{
+			_SurfaceAboutToBeDestroyed = true;
+			FinalizeGL();
+		}
+	}
+	return XQTBase::event(ev);
+
+
+	//case QEvent::Paint:
+	//case QEvent::Expose:
+	//	Render();
+	//	return true;
 
 	default:
 		return XQTBase::event(ev);
@@ -151,7 +176,7 @@ bool XThreadedGLWindow::event(QEvent* ev)
 
 void XThreadedGLWindow::FinalizeGL()
 {
-	QMutexLocker locker{&_renderLock};
+	QMutexLocker locker{ &_renderLock };
 	if (_glctx)
 	{
 		bool ok = _glctx->makeCurrent(this);
@@ -162,8 +187,8 @@ void XThreadedGLWindow::FinalizeGL()
 		delete _paintDev;
 		_paintDev = nullptr;
 
-		_glctx->deleteLater();
-		_glctx = nullptr;
+		//_glctx->deleteLater();
+		//_glctx = nullptr;
 	}
 }
 
@@ -181,7 +206,7 @@ XThreadedGLWindow::XThreadedGLWindow(QWindow* parent)
 {
 	setSurfaceType(QSurface::OpenGLSurface);
 
-	_thread = new QThread{this};
+	_thread = new QThread{ this };
 	_renderer = new XThreadedGLWindowRenderer{ nullptr, this };
 	_renderer->moveToThread(_thread);
 	connect(_thread, &QThread::finished, _renderer, &QObject::deleteLater);
@@ -193,8 +218,14 @@ XThreadedGLWindow::~XThreadedGLWindow()
 {
 	_thread->quit();
 	_thread->wait();
-	FinalizeGL();
-	
+
+	if (_glctx)
+	{
+		_glctx->deleteLater();
+		_glctx = nullptr;
+	}
+	//FinalizeGL();
+
 }
 
 XThreadedGLWindowRenderer::XThreadedGLWindowRenderer(QObject* parent, XThreadedGLWindow* window) :

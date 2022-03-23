@@ -44,10 +44,12 @@ private:
 	QMutex _renderLock;
 	QThread* _thread{nullptr};
 	XThreadedGLWindowRenderer* _renderer{ nullptr };
+	bool _SurfaceAboutToBeDestroyed{ false };
 
 private:
 	void Render();
 	void NotifyRenderer();
+	void FinalizeGL();
 
 signals:
 	void RendererSignal();
@@ -66,7 +68,6 @@ protected:
 	virtual void GLFinalize() = 0;
 
 public:
-	void FinalizeGL();
 	void SetAnimating(bool run);
 
 public:

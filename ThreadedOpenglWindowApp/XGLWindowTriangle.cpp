@@ -25,11 +25,11 @@ void XGLWindowTriangle::GLPaint(QPaintDevice* paintDev)
 	glClearColor(bgcolor.redF(), bgcolor.greenF(), bgcolor.blueF(), 1.0f);
 
 
-	//QPainter painter{ paintDev };
+	QPainter painter{ paintDev };
 
-	//painter.setPen(Qt::white);
-	//painter.setFont(QFont("Arial", 30));
-	//painter.drawText(50, 50,  QString::number(++_counter));
+	painter.setPen(Qt::white);
+	painter.setFont(QFont("Arial", 30));
+	painter.drawText(50, 50,  QString::number(++_counter));
 }
 
 void XGLWindowTriangle::GLFinalize()
@@ -61,5 +61,5 @@ XGLWindowTriangle::XGLWindowTriangle(QWindow*parent)
 
 XGLWindowTriangle::~XGLWindowTriangle()
 {
-	FinalizeGL();
+	//FinalizeGL();
 }
