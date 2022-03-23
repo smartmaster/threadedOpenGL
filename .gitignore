@@ -1,0 +1,7 @@
+.vs
+out
+*.cbt
+*.idx
+*.log
+x64
+*.user
