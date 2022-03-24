@@ -233,17 +233,22 @@ bool XThreadGLWindow::WaitRenderTimeout(ulong mstime)
 	return waitOK;
 }
 
+XThreadGLRender* XThreadGLWindow::ThreadGLRender()
+{
+	return _render;
+}
+
 void XThreadGLWindow::SetAnimating(bool run)
 {
 	_animating = run;
 	if (_animating)
 	{
-		connect(_render, &XThreadGLRender::RenderDoneSignal, this, &XThreadGLWindow::requestUpdate);
+		connect(_render, &XThreadGLRender::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
 		requestUpdate();
 	}
 	else
 	{
-		disconnect(_render, &XThreadGLRender::RenderDoneSignal, this, &XThreadGLWindow::requestUpdate);
+		disconnect(_render, &XThreadGLRender::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
 	}
 }
 
@@ -300,7 +305,7 @@ void XThreadGLRender::Render()
 
 	_glwin->Render();
 	_glwin->_glctx->moveToThread(_glwin->thread());
-	emit RenderDoneSignal();
+	emit RenderFrameDoneSignal();
 
 
 	lockerRender.unlock();

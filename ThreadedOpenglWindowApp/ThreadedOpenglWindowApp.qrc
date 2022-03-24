@@ -1,4 +1,10 @@
 <RCC>
-    <qresource prefix="ThreadedOpenglWindowApp">
+    <qresource prefix="/image">
+        <file>tex.jpg</file>
+        <file>side5.png</file>
+    </qresource>
+    <qresource prefix="/shaders">
+        <file>frag.frag</file>
+        <file>vert.vert</file>
     </qresource>
 </RCC>

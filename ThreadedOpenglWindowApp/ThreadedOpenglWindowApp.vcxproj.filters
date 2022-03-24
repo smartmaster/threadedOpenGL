@@ -62,5 +62,8 @@
     <ClInclude Include="XSurfaceFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SMLAxisSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

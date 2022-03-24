@@ -29,7 +29,7 @@ public slots:
 	void Render();
 
 signals:
-	void RenderDoneSignal();
+	void RenderFrameDoneSignal();
 
 };
 
@@ -83,10 +83,13 @@ protected:
 	virtual void GLPaint(QPaintDevice* paintDev) = 0;
 	virtual void GLFinalize() = 0;
 
+protected:
+	XThreadGLRender* ThreadGLRender();
+
 public:
 	void SetAnimating(bool run);
 
 public:
 	XThreadGLWindow(QWindow* parent);
-	~XThreadGLWindow();
+	virtual ~XThreadGLWindow();
 };
