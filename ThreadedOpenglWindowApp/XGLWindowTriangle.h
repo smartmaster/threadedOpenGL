@@ -80,5 +80,5 @@ private:
 
 public:
 	XGLWindowTriangle(QWindow *parent);
-	~XGLWindowTriangle();
+	virtual ~XGLWindowTriangle() override;
 };
