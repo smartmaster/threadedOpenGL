@@ -13,46 +13,57 @@
 #include <QMutex>
 #include <QThread>
 
-class XThreadedGLWindow;
-class XThreadedGLWindowRenderer : public QObject
+class XThreadGLWindow;
+class XThreadGLRenderer : public QObject
 {
 	Q_OBJECT
 
 private:
-	XThreadedGLWindow* _glwin{ nullptr };
+	XThreadGLWindow* _glwin{ nullptr };
 
 public:
-	XThreadedGLWindowRenderer(QObject* parent, XThreadedGLWindow* window);
+	XThreadGLRenderer(QObject* parent, XThreadGLWindow* window);
 
 public slots:
 	void Render();
+
+signals:
+	void RenderDoneSignal();
+
 };
 
-class XThreadedGLWindow : public QWindow, protected QOpenGLFunctions_4_5_Core
+class XThreadGLWindow : public QWindow, protected QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
 
 private:
-	friend class XThreadedGLWindowRenderer;
+	friend class XThreadGLRenderer;
 	using XQTBase = QWindow;
 
 private:
 	QOpenGLPaintDevice* _paintDev{ nullptr };
 	QOpenGLContext* _glctx{ nullptr };
-	bool _animating{ false };
+
 	int _eventCounter{ 0 };
+	bool _animating{ false };
+	bool _isRenerering{ false };
+	bool _SurfaceDestroyed{ false };
+
 	QMutex _renderLock;
 	QThread* _thread{nullptr};
-	XThreadedGLWindowRenderer* _renderer{ nullptr };
-	bool _SurfaceAboutToBeDestroyed{ false };
+	XThreadGLRenderer* _renderer{ nullptr };
+	
 
 private:
 	void Render();
-	void NotifyRenderer();
+	void RequestRender();
 	void FinalizeGL();
 
+	bool MakeCurrentCtx(const char* msg, const char* msg1);
+	void DoneCurrentCtx();
+
 signals:
-	void RendererSignal();
+	void RequestRenderSignal();
 
 private:
 	virtual bool event(QEvent* ev) override;
@@ -71,6 +82,6 @@ public:
 	void SetAnimating(bool run);
 
 public:
-	XThreadedGLWindow(QWindow* parent);
-	~XThreadedGLWindow();
+	XThreadGLWindow(QWindow* parent);
+	~XThreadGLWindow();
 };

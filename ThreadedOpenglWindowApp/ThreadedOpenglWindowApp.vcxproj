@@ -87,7 +87,7 @@
   <ItemGroup>
     <ClCompile Include="XGLWindowTriangle.cpp" />
     <ClCompile Include="XSurfaceFormat.cpp" />
-    <ClCompile Include="XThreadedGlWindow.cpp" />
+    <ClCompile Include="XThreadGLWindow.cpp" />
     <QtRcc Include="ThreadedOpenglWindowApp.qrc" />
     <QtUic Include="ThreadedOpenglWindowApp.ui" />
     <QtMoc Include="ThreadedOpenglWindowApp.h" />
@@ -95,7 +95,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="XThreadedGlWindow.h" />
+    <QtMoc Include="XThreadGLWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="XGLWindowTriangle.h" />

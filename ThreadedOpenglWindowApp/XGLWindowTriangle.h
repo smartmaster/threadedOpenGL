@@ -1,14 +1,14 @@
 #pragma once
 
 #include <QObject>
-#include "XThreadedGlWindow.h"
+#include "XThreadGLWindow.h"
 
-class XGLWindowTriangle : public XThreadedGLWindow
+class XGLWindowTriangle : public XThreadGLWindow
 {
 	Q_OBJECT
 
 private:
-	using XQTBase = XThreadedGLWindow;
+	using XQTBase = XThreadGLWindow;
 
 private:
 	bool _isAnimating{ false };

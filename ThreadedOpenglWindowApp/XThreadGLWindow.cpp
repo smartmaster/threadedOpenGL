@@ -1,20 +1,20 @@
 #include <QtGlobal>
 
-#include "XThreadedGlWindow.h"
+#include "XThreadGLWindow.h"
 #include <QMutexLocker>
 
-#define DoneCurrentCtx(glctx) glctx->doneCurrent()
 
-void XThreadedGLWindow::Render()
+void XThreadGLWindow::Render()
 {
 	if (isExposed())
 	{
-		bool ok = _glctx->makeCurrent(this);
-		Q_ASSERT_X(ok && _glctx->isValid(), __FILE__, __FUNCTION__);
+
+		MakeCurrentCtx(__FUNCTION__, __FILE__);
+
 		GLPaint(_paintDev);
 		_glctx->swapBuffers(this);
 
-		DoneCurrentCtx(_glctx);
+		DoneCurrentCtx();
 		//if (_animating)
 		//{
 		//	requestUpdate();
@@ -23,26 +23,28 @@ void XThreadedGLWindow::Render()
 	}
 }
 
-void XThreadedGLWindow::NotifyRenderer()
+void XThreadGLWindow::RequestRender()
 {
+	if(!_isRenerering)
 	{
 		QMutexLocker locker{ &_renderLock };
+		_isRenerering = true;
 		_glctx->moveToThread(_thread);
-		emit RendererSignal();
+		emit RequestRenderSignal();
 	}
 
-	if (_animating)
-	{
-		requestUpdate();
-	}
+	//if (_animating)
+	//{
+	//	requestUpdate();
+	//}
 }
 
-void XThreadedGLWindow::paintEvent(QPaintEvent* ev)
+void XThreadGLWindow::paintEvent(QPaintEvent* ev)
 {
-	NotifyRenderer();
+	RequestRender();
 }
 
-//void XThreadedGLWindow::exposeEvent(QExposeEvent* ev)
+//void XThreadGLWindow::exposeEvent(QExposeEvent* ev)
 //{
 //	NotifyRenderer();
 //}
@@ -64,38 +66,38 @@ static void APIENTRY GLDebugPoc(
 	qDebug() << str;
 }
 
-void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
+void XThreadGLWindow::resizeEvent(QResizeEvent* ev)
 {
-	if (_SurfaceAboutToBeDestroyed)
+	if (_SurfaceDestroyed)
 	{
 		return;
 	}
+
+	bool initGL = false;
 
 	QMutexLocker locker{ &_renderLock };
 	
 	if (nullptr == _glctx)
 	{
+		initGL = true;
 		//_glctx = new QOpenGLContext{ this };
 		_glctx = new QOpenGLContext{ nullptr }; //cannot have parent for moving thread
 		_glctx->setFormat(requestedFormat());
 		_glctx->setShareContext(nullptr);
 		_glctx->create();
-		bool ok = _glctx->makeCurrent(this);
-		Q_ASSERT_X(ok && _glctx->isValid(), __FILE__, __FUNCTION__);
+	}
 
+	MakeCurrentCtx(__FUNCTION__, __FILE__);
+
+	if (initGL)
+	{
 		_paintDev = new QOpenGLPaintDevice{};
-
 
 		initializeOpenGLFunctions();
 		glDebugMessageCallback(GLDebugPoc, nullptr);
 
 
 		GLInitialize();
-	}
-	else
-	{
-		bool ok = _glctx->makeCurrent(this);
-		Q_ASSERT_X(ok && _glctx->isValid(), __FILE__, __FUNCTION__);
 	}
 
 	qreal dpr = devicePixelRatio();
@@ -104,30 +106,30 @@ void XThreadedGLWindow::resizeEvent(QResizeEvent* ev)
 
 	GLResize(ev->size(), ev->oldSize());
 
-	DoneCurrentCtx(_glctx);
+	DoneCurrentCtx();
 }
 
-//void XThreadedGLWindow::GLInitialize()
+//void XThreadGLWindow::GLInitialize()
 //{
 //
 //}
 //
-//void XThreadedGLWindow::GLResize(const QSize& size, const QSize& oldSize)
+//void XThreadGLWindow::GLResize(const QSize& size, const QSize& oldSize)
 //{
 //
 //}
 //
-//void XThreadedGLWindow::GLPaint(QPaintDevice* paintDev)
+//void XThreadGLWindow::GLPaint(QPaintDevice* paintDev)
 //{
 //
 //}
 //
-//void XThreadedGLWindow::GLFinalize()
+//void XThreadGLWindow::GLFinalize()
 //{
 //
 //}
 
-bool XThreadedGLWindow::event(QEvent* ev)
+bool XThreadGLWindow::event(QEvent* ev)
 {
 	QEvent::Type et = ev->type();
 
@@ -147,42 +149,32 @@ bool XThreadedGLWindow::event(QEvent* ev)
 	switch (et)
 	{
 	case QEvent::UpdateRequest:
-		NotifyRenderer();
-		return true;
+		RequestRender();
+		break;
 
 	case QEvent::PlatformSurface:
 	{
 		auto* psev = (QPlatformSurfaceEvent*)(ev);
 		if (QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed == psev->surfaceEventType())
 		{
-			_SurfaceAboutToBeDestroyed = true;
+			_SurfaceDestroyed = true;
 			FinalizeGL();
 		}
 	}
-	return XQTBase::event(ev);
+	break;
 
-
-	//case QEvent::Paint:
-	//case QEvent::Expose:
-	//	Render();
-	//	return true;
-
-	default:
-		return XQTBase::event(ev);
-		break;
 	}
 
-
+	return XQTBase::event(ev);
 }
 
-void XThreadedGLWindow::FinalizeGL()
+void XThreadGLWindow::FinalizeGL()
 {
 	QMutexLocker locker{ &_renderLock };
 
 	if (_glctx)
 	{
-		bool ok = _glctx->makeCurrent(this);
-		Q_ASSERT_X(ok && _glctx->isValid(), __FUNCTION__, __FILE__);
+		MakeCurrentCtx(__FUNCTION__, __FILE__);
 
 		GLFinalize();
 
@@ -192,35 +184,52 @@ void XThreadedGLWindow::FinalizeGL()
 		//_glctx->deleteLater();
 		//_glctx = nullptr;
 
-		DoneCurrentCtx(_glctx);
+		DoneCurrentCtx();
 	}
 }
 
-void XThreadedGLWindow::SetAnimating(bool run)
+bool XThreadGLWindow::MakeCurrentCtx(const char* msg, const char* msg1)
+{
+	bool ok = _glctx->makeCurrent(this);
+	Q_ASSERT_X(ok && _glctx->isValid(), msg, msg1);
+	return ok;
+}
+
+void XThreadGLWindow::DoneCurrentCtx()
+{
+	_glctx->doneCurrent();
+}
+
+void XThreadGLWindow::SetAnimating(bool run)
 {
 	_animating = run;
 	if (_animating)
 	{
+		connect(_renderer, &XThreadGLRenderer::RenderDoneSignal, this, &XThreadGLWindow::requestUpdate);
 		requestUpdate();
+	}
+	else
+	{
+		disconnect(_renderer, &XThreadGLRenderer::RenderDoneSignal, this, &XThreadGLWindow::requestUpdate);
 	}
 }
 
-XThreadedGLWindow::XThreadedGLWindow(QWindow* parent)
+XThreadGLWindow::XThreadGLWindow(QWindow* parent)
 	: QWindow(parent)
 {
 	setSurfaceType(QSurface::OpenGLSurface);
 
 	_thread = new QThread{ this };
-	_renderer = new XThreadedGLWindowRenderer{ nullptr, this };
+	_renderer = new XThreadGLRenderer{ nullptr, this };
 	_renderer->moveToThread(_thread);
 
 	connect(_thread, &QThread::finished, _renderer, &QObject::deleteLater);
-	connect(this, &XThreadedGLWindow::RendererSignal, _renderer, &XThreadedGLWindowRenderer::Render);
+	connect(this, &XThreadGLWindow::RequestRenderSignal, _renderer, &XThreadGLRenderer::Render);
 
 	_thread->start();
 }
 
-XThreadedGLWindow::~XThreadedGLWindow()
+XThreadGLWindow::~XThreadGLWindow()
 {
 	_thread->quit();
 	_thread->wait();
@@ -234,15 +243,25 @@ XThreadedGLWindow::~XThreadedGLWindow()
 
 }
 
-XThreadedGLWindowRenderer::XThreadedGLWindowRenderer(QObject* parent, XThreadedGLWindow* window) :
+XThreadGLRenderer::XThreadGLRenderer(QObject* parent, XThreadGLWindow* window) :
 	QObject{ parent },
 	_glwin{ window }
 {
 }
 
-void XThreadedGLWindowRenderer::Render()
+void XThreadGLRenderer::Render()
 {
 	QMutexLocker locker{ &_glwin->_renderLock };
+
+	static int xxxdebug = 0;
+	if (xxxdebug)
+	{
+		QThread::msleep(3000);
+	}
+
+
 	_glwin->Render();
 	_glwin->_glctx->moveToThread(_glwin->thread());
+	_glwin->_isRenerering = false;
+	emit RenderDoneSignal();
 }
