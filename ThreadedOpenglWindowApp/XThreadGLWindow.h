@@ -12,9 +12,10 @@
 #include <QSize>
 #include <QMutex>
 #include <QThread>
+#include <QWaitCondition>
 
 class XThreadGLWindow;
-class XThreadGLRenderer : public QObject
+class XThreadGLRender : public QObject
 {
 	Q_OBJECT
 
@@ -22,7 +23,7 @@ private:
 	XThreadGLWindow* _glwin{ nullptr };
 
 public:
-	XThreadGLRenderer(QObject* parent, XThreadGLWindow* window);
+	XThreadGLRender(QObject* parent, XThreadGLWindow* window);
 
 public slots:
 	void Render();
@@ -37,7 +38,7 @@ class XThreadGLWindow : public QWindow, protected QOpenGLFunctions_4_5_Core
 	Q_OBJECT
 
 private:
-	friend class XThreadGLRenderer;
+	friend class XThreadGLRender;
 	using XQTBase = QWindow;
 
 private:
@@ -50,8 +51,10 @@ private:
 	bool _SurfaceDestroyed{ false };
 
 	QMutex _renderLock;
+	QMutex _timeoutLock;
+	QWaitCondition _condTimeout;
 	QThread* _thread{nullptr};
-	XThreadGLRenderer* _renderer{ nullptr };
+	XThreadGLRender* _render{ nullptr };
 	
 
 private:
@@ -61,6 +64,8 @@ private:
 
 	bool MakeCurrentCtx(const char* msg, const char* msg1);
 	void DoneCurrentCtx();
+
+	bool WaitRenderTimeout(ulong mstime);
 
 signals:
 	void RequestRenderSignal();
