@@ -49,6 +49,9 @@
     <ClCompile Include="XGLWindowTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XWaitObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="XThreadGLWindow.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SMLAxisSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XWaitObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

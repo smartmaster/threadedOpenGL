@@ -675,7 +675,8 @@ void XGLWindowTriangle::keyPressEvent(QKeyEvent* ev)
 XGLWindowTriangle::XGLWindowTriangle(QWindow*parent)
 	: XQTBase(parent)
 {
-	connect(ThreadGLRender(), &XThreadGLRender::RenderFrameDoneSignal, this, &XGLWindowTriangle::on_timeout);
+	//connect(ThreadGLRender(), &XThreadGLRender::RenderFrameDoneSignal, this, &XGLWindowTriangle::on_timeout);
+	connect(this, &XGLWindowTriangle::RenderFrameDoneSignal, this, &XGLWindowTriangle::on_timeout);
 }
 
 XGLWindowTriangle::~XGLWindowTriangle()

@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\sss-dev\glm-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\sss-dev\glm-master;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="XWaitObject.cpp" />
     <ClCompile Include="XGLWindowTriangle.cpp" />
     <ClCompile Include="XSurfaceFormat.cpp" />
     <ClCompile Include="XThreadGLWindow.cpp" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <QtMoc Include="XGLWindowTriangle.h" />
     <ClInclude Include="SMLAxisSystem.h" />
+    <ClInclude Include="XWaitObject.h" />
     <ClInclude Include="XSurfaceFormat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

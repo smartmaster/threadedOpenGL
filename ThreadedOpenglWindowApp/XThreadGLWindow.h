@@ -13,6 +13,7 @@
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
+#include "XWaitObject.h"
 
 class XThreadGLWindow;
 class XThreadGLRender : public QObject
@@ -28,8 +29,8 @@ public:
 public slots:
 	void Render();
 
-signals:
-	void RenderFrameDoneSignal();
+//signals:
+//	void RenderFrameDoneSignal();
 
 };
 
@@ -47,17 +48,23 @@ private:
 
 	int _eventCounter{ 0 };
 	bool _animating{ false };
-	bool _isRenerering{ false };
+	//bool _isRenerering{ false };
 	bool _SurfaceDestroyed{ false };
 
+	
+	
 	QMutex _renderLock;
-	QMutex _timeoutLock;
-	QWaitCondition _condTimeout;
 	QThread* _thread{nullptr};
 	XThreadGLRender* _render{ nullptr };
+
+	//QMutex _timeoutLock;
+	//QWaitCondition _condTimeout;
+	XEvent _event{false};
+	//XSemphore _event{ 1 };
 	
 
 private:
+	void ThreadRender();
 	void Render();
 	void RequestRender();
 	void FinalizeGL();
@@ -65,10 +72,11 @@ private:
 	bool MakeCurrentCtx(const char* msg, const char* msg1);
 	void DoneCurrentCtx();
 
-	bool WaitRenderTimeout(ulong mstime);
+	//bool WaitRenderTimeout(ulong mstime);
 
 signals:
 	void RequestRenderSignal();
+	void RenderFrameDoneSignal();
 
 private:
 	virtual bool event(QEvent* ev) override;
@@ -83,8 +91,8 @@ protected:
 	virtual void GLPaint(QPaintDevice* paintDev) = 0;
 	virtual void GLFinalize() = 0;
 
-protected:
-	XThreadGLRender* ThreadGLRender();
+//protected:
+//	XThreadGLRender* ThreadGLRender();
 
 public:
 	void SetAnimating(bool run);
