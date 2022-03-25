@@ -548,7 +548,64 @@ void XGLWindowTriangle::GLPaint(QPaintDevice* paintDev)
 
 void XGLWindowTriangle::GLFinalize()
 {
+	/////////////////////////////////////////////////////////////////
+	if (_vboPos != -1)
+	{
+		glDeleteBuffers(1, &_vboPos);
+		_vboPos = -1;
+	}
 
+	if (_vboColor != -1)
+	{
+		glDeleteBuffers(1, &_vboColor);
+		_vboColor = -1;
+	}
+
+	if (_vboElemet != -1)
+	{
+		glDeleteBuffers(1, &_vboElemet);
+		_vboElemet = -1;
+	}
+
+	if (_vboTextCoord != -1)
+	{
+		glDeleteBuffers(1, &_vboTextCoord);
+		_vboTextCoord = -1;
+	}
+
+	if (_texture != -1)
+	{
+		glDeleteTextures(1, &_texture);
+		_texture = -1;
+	}
+
+
+	/////////////////////////////////////////////////////////////////
+//    if(_vboPosLine != -1)
+//    {
+//        glDeleteBuffers(1, &_vboPosLine);
+//        _vboPosLine = -1;
+//    }
+
+//    if(_vboColorLine != -1)
+//    {
+//        glDeleteBuffers(1, &_vboColorLine);
+//        _vboColorLine = -1;
+//    }
+
+//    if(_vboElemetLine != -1)
+//    {
+//        glDeleteBuffers(1, &_vboElemetLine);
+//        _vboElemetLine = -1;
+//    }
+
+
+	/////////////////////////////////////////////////////////////////
+	if (_vao != -1)
+	{
+		glDeleteVertexArrays(1, &_vao);
+		_vao = -1;
+	}
 }
 
 void XGLWindowTriangle::keyPressEvent(QKeyEvent* ev)
