@@ -59,7 +59,7 @@ private:
 
 	//QMutex _timeoutLock;
 	//QWaitCondition _condTimeout;
-	XEvent _eventIsRendering{false};
+	XEvent _eventRenderDone{false};
 	//XSemphore _event{ 1 };
 
 	bool _requestMode{ false };
