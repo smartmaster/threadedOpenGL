@@ -62,9 +62,11 @@ private:
 	XEvent _eventIsRendering{false};
 	//XSemphore _event{ 1 };
 
-	bool _requestMode{ true };
+	bool _requestMode{ false };
 	volatile bool _ctxAcquired{ false };
 	QWaitCondition _condRequest;
+
+	bool _multiThreadMode{ true };
 	
 
 private:
@@ -108,6 +110,6 @@ public:
 	void SetAnimating(bool run);
 
 public:
-	XThreadGLWindow(QWindow* parent);
+	XThreadGLWindow(QWindow* parent, bool requestMode = false, bool multiThreadMode = true);
 	virtual ~XThreadGLWindow();
 };
