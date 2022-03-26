@@ -57,9 +57,15 @@ void XThreadGLWindow::RequestRender()
 	//}
 
 	const ulong timeOut = 500;
-	bool waitOK = _event.Wait(timeOut);
+	bool waitOK = _eventIsRendering.Wait(timeOut);
 	if (!waitOK)
 	{
+		return;
+	}
+
+	if (_requestMode)
+	{
+		emit RequestRenderSignal();
 		return;
 	}
 
@@ -97,6 +103,11 @@ static void xxxDelay()
 void XThreadGLWindow::ThreadRender()
 {
 	QMutexLocker lockerRender{ &_renderLock };
+
+	if (_requestMode)
+	{
+		RequestCtx();
+	}
 	
 	xxxDelay();
 
@@ -109,7 +120,7 @@ void XThreadGLWindow::ThreadRender()
 	//_glwin->_isRenerering = false;
 	//lockerTimeout.unlock();
 	//_glwin->_condTimeout.wakeOne();
-	_event.Notify(false);
+	_eventIsRendering.Notify(false);
 
 	emit RenderFrameDoneSignal();
 }
@@ -305,6 +316,27 @@ void XThreadGLWindow::DoneCurrentCtx()
 	_glctx->doneCurrent();
 }
 
+void XThreadGLWindow::RequestCtx()
+{
+	//must be protected by QMutexLocker<QMutex> locker{ &_renderLock };
+	emit RequestCtxSignal();
+	//while (_glctx->thread() != _thread)
+	while (!_ctxAcquired)
+	{
+		_condRequest.wait(&_renderLock);
+	}
+	_ctxAcquired = false;
+}
+
+void XThreadGLWindow::ResponseCtx()
+{
+	QMutexLocker<QMutex> locker{ &_renderLock };
+	_glctx->moveToThread(_thread);
+	_ctxAcquired = true;
+	locker.unlock();
+	_condRequest.notify_one();
+}
+
 //bool XThreadGLWindow::WaitRenderTimeout(ulong mstime)
 //{
 //	bool waitOK = true;
@@ -351,6 +383,11 @@ XThreadGLWindow::XThreadGLWindow(QWindow* parent)
 
 	connect(_thread, &QThread::finished, _render, &QObject::deleteLater);
 	connect(this, &XThreadGLWindow::RequestRenderSignal, _render, &XThreadGLRender::Render);
+
+	if (_requestMode)
+	{
+		connect(this, &XThreadGLWindow::RequestCtxSignal, this, &XThreadGLWindow::ResponseCtx);
+	}
 
 	_thread->start();
 }

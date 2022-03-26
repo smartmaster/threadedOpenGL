@@ -59,8 +59,12 @@ private:
 
 	//QMutex _timeoutLock;
 	//QWaitCondition _condTimeout;
-	XEvent _event{false};
+	XEvent _eventIsRendering{false};
 	//XSemphore _event{ 1 };
+
+	bool _requestMode{ true };
+	volatile bool _ctxAcquired{ false };
+	QWaitCondition _condRequest;
 	
 
 private:
@@ -74,7 +78,13 @@ private:
 
 	//bool WaitRenderTimeout(ulong mstime);
 
+	void RequestCtx();
+
+public slots:
+	void ResponseCtx();
+
 signals:
+	void RequestCtxSignal();
 	void RequestRenderSignal();
 	void RenderFrameDoneSignal();
 
