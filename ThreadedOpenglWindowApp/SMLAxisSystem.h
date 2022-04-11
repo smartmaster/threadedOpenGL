@@ -116,7 +116,7 @@ public:
     }
 
 
-    AxisSystem& SetScale(const glm::tvec3<T>& scalar)
+    AxisSystem& ScaleAbsolutely(const glm::tvec3<T>& scalar)
     {
         _unitLen = scalar;
         return *this;
