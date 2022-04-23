@@ -4,7 +4,7 @@
 #include "XThreadGLWindow.h"
 
 #include <glm/glm.hpp>
-#include "SMLAxisSystem.h"
+#include "SMLCoordSystem.h"
 
 class XGLWindowTriangle : public XThreadGLWindow
 {
@@ -56,8 +56,8 @@ private:
 	inline static constexpr int texCoordLocation = 2;
 
 
-	SmartLib::AxisSystem<float> _axisModel;
-	SmartLib::AxisSystem<float> _axisEye;
+	SmartLib::CoordSystem<float> _axisModel;
+	SmartLib::CoordSystem<float> _axisEye;
 	glm::mat4 _frustum;
 
 

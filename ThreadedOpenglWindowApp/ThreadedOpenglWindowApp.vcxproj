@@ -31,7 +31,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>_qt-everywhere-src-dev</QtInstall>
+    <QtInstall>sss-dev_qt-everywhere-src-dev</QtInstall>
     <QtModules>core;opengl;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\sss-dev\glm-master;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>e:\sss-dev\glm-master;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -105,7 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="XGLWindowTriangle.h" />
-    <ClInclude Include="SMLAxisSystem.h" />
+    <ClInclude Include="SMLCoordSystem.h" />
     <ClInclude Include="XWaitObject.h" />
     <ClInclude Include="XSurfaceFormat.h" />
   </ItemGroup>

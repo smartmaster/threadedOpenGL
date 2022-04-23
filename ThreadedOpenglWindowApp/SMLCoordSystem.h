@@ -9,7 +9,7 @@
 namespace SmartLib
 {
 template<typename T = double>
-class AxisSystem
+class CoordSystem
 {
 private:
     inline static const glm::tmat4x4<T> MatIdentity{T{1}};
@@ -33,25 +33,25 @@ public:
 
 public:
 
-    AxisSystem()
+    CoordSystem()
     {
     }
 
-    AxisSystem(const AxisSystem& as) :
+    CoordSystem(const CoordSystem& as) :
         _axis{as._axis},
         _unitLen{as._unitLen},
         _origin{as._origin}
     {
     }
 
-    AxisSystem(AxisSystem&& as) :
+    CoordSystem(CoordSystem&& as) :
         _axis{std::move(as._axis)},
         _unitLen{std::move(as._unitLen)},
         _origin{std::move(as._origin)}
     {
     }
 
-    const AxisSystem& operator=(const AxisSystem& as)
+    const CoordSystem& operator=(const CoordSystem& as)
     {
         _axis = as._axis;
         _unitLen = as._unitLen;
@@ -59,7 +59,7 @@ public:
         return *this;
     }
 
-    const AxisSystem& operator=(AxisSystem&& as)
+    const CoordSystem& operator=(CoordSystem&& as)
     {
         _axis = std::move(as._axis);
         _unitLen = std::move(as._unitLen);
@@ -67,7 +67,7 @@ public:
         return *this;
     }
 
-    AxisSystem& Reset()
+    CoordSystem& Reset()
     {
         _axis = MatIdentity;
         _unitLen = VecAllOne;
@@ -78,21 +78,21 @@ public:
 
 
     //move along the current axis directions and with the current unit length
-    AxisSystem& Translate(const glm::tvec3<T>& offset)
+    CoordSystem& Translate(const glm::tvec3<T>& offset)
     {
         _origin += M4xP3(_axis, offset * _unitLen);
         return *this;
     }
 
     //move along the absolute (world) axis directions
-    AxisSystem& TranslateAbsolutely(const glm::tvec3<T>& offsetAbsolutely)
+    CoordSystem& TranslateAbsolutely(const glm::tvec3<T>& offsetAbsolutely)
     {
         _origin += offsetAbsolutely;
         return *this;
     }
 
     //rotate in current coordinates system
-    AxisSystem& Rotate(T radians, const glm::tvec3<T>& rotAxis)
+    CoordSystem& Rotate(T radians, const glm::tvec3<T>& rotAxis)
     {
         auto rotAxisAbsolutely = M4xV3(_axis, rotAxis);
         _axis = glm::rotate<T>(MatIdentity, radians, rotAxisAbsolutely) * _axis;
@@ -101,7 +101,7 @@ public:
 
 
     //rotate in absolute (world) coordinates system
-    AxisSystem& RotateAbsolutely(T radians, const glm::tvec3<T>& rotAxisAbsolutely)
+    CoordSystem& RotateAbsolutely(T radians, const glm::tvec3<T>& rotAxisAbsolutely)
     {
         _axis = glm::rotate<T>(MatIdentity, radians, rotAxisAbsolutely) * _axis;
         return *this;
@@ -109,28 +109,28 @@ public:
 
 
     //scale in current coordinates system
-    AxisSystem& Scale(const glm::tvec3<T>& scalar)
+    CoordSystem& Scale(const glm::tvec3<T>& scalar)
     {
         _unitLen *= scalar;
         return *this;
     }
 
 
-    AxisSystem& ScaleAbsolutely(const glm::tvec3<T>& scalar)
+    CoordSystem& ScaleAbsolutely(const glm::tvec3<T>& scalar)
     {
         _unitLen = scalar;
         return *this;
     }
 
 
-    AxisSystem& SetOrigin(const glm::tvec3<T>& origin)
+    CoordSystem& SetOrigin(const glm::tvec3<T>& origin)
     {
         _origin = origin;
         return *this;
     }
 
     //axis should be unit and orthogonal matrix
-    AxisSystem& SetAxis(const glm::tmat4x4<T>& axis)
+    CoordSystem& SetAxis(const glm::tmat4x4<T>& axis)
     {
         _axis = axis;
         return *this;
@@ -272,7 +272,7 @@ public:
         auto xAxis = glm::cross(up, zAxis);
         auto yAxis = glm::cross(zAxis, xAxis);
 
-        AxisSystem<T> axisSys;
+        CoordSystem<T> axisSys;
         axisSys.MakeFromOHVZ(eye, xAxis, yAxis, zAxis);
 
         return axisSys.WorldToModelMat();
@@ -286,7 +286,7 @@ public:
             )
     {
         //////////////////////////////////////
-        AxisSystem<T> axisSys;
+        CoordSystem<T> axisSys;
 
         axisSys.Scale(glm::tvec3<T>{T{1}, T{1}, T{-1}})
                 .Translate(glm::tvec3<T>{(left + right)/T{2}, (bottom + top)/T{2}, (zNear + zFar)/T{2}})

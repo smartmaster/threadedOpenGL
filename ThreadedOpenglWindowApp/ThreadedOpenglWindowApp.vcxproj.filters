@@ -65,7 +65,7 @@
     <ClInclude Include="XSurfaceFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SMLAxisSystem.h">
+    <ClInclude Include="SMLCoordSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XWaitObject.h">
