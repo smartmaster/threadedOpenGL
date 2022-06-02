@@ -1,4 +1,4 @@
-#include "XGLWindowTriangle.h"
+#include "SmlGLWindowTriangle.h"
 #include <QColor>
 #include <QPainter>
 
@@ -97,7 +97,7 @@ static GLuint oglindics[] = {
 //};
 
 
-void XGLWindowTriangle::CreateProgram(const GLchar* const vertSource, const GLchar* const  fragSource)
+void SmlGLWindowTriangle::CreateProgram(const GLchar* const vertSource, const GLchar* const  fragSource)
 {
 	/////////////////////////////////////////////////////////////////
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
@@ -126,7 +126,7 @@ void XGLWindowTriangle::CreateProgram(const GLchar* const vertSource, const GLch
 }
 
 
-void XGLWindowTriangle::GLInitialize()
+void SmlGLWindowTriangle::GLInitialize()
 {
 	/////////////////////////////////////////////////////////////////
 	//ResetEye();
@@ -337,11 +337,11 @@ void XGLWindowTriangle::GLInitialize()
 	/////////////////////////////////////////////////////////////////
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
+	glFrontFace(GL_CCW);
 }
 
 
-void XGLWindowTriangle::on_timeout()
+void SmlGLWindowTriangle::on_timeout()
 {
 
 
@@ -379,7 +379,7 @@ void XGLWindowTriangle::on_timeout()
 }
 
 
-void XGLWindowTriangle::GLResize(const QSize& size, const QSize& oldSize)
+void SmlGLWindowTriangle::GLResize(const QSize& size, const QSize& oldSize)
 {
 	int w = size.width();
 	int h = size.height();
@@ -408,7 +408,7 @@ void XGLWindowTriangle::GLResize(const QSize& size, const QSize& oldSize)
 
 }
 
-void XGLWindowTriangle::GLPaint(QPaintDevice* paintDev)
+void SmlGLWindowTriangle::GLPaint(QPaintDevice* paintDev)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -546,7 +546,7 @@ void XGLWindowTriangle::GLPaint(QPaintDevice* paintDev)
 //    }
 }
 
-void XGLWindowTriangle::GLFinalize()
+void SmlGLWindowTriangle::GLFinalize()
 {
 	/////////////////////////////////////////////////////////////////
 	if (_vboPos != -1)
@@ -608,7 +608,7 @@ void XGLWindowTriangle::GLFinalize()
 	}
 }
 
-void XGLWindowTriangle::keyPressEvent(QKeyEvent* ev)
+void SmlGLWindowTriangle::keyPressEvent(QKeyEvent* ev)
 {
 	//int key = ev->key();
 	//switch (key)
@@ -729,14 +729,14 @@ void XGLWindowTriangle::keyPressEvent(QKeyEvent* ev)
 	
 }
 
-XGLWindowTriangle::XGLWindowTriangle(QWindow*parent)
+SmlGLWindowTriangle::SmlGLWindowTriangle(QWindow*parent)
 	: XQTBase(parent)
 {
 	//connect(ThreadGLRender(), &XThreadGLRender::RenderFrameDoneSignal, this, &XGLWindowTriangle::on_timeout);
-	connect(this, &XGLWindowTriangle::RenderFrameDoneSignal, this, &XGLWindowTriangle::on_timeout);
+	connect(this, &SmlGLWindowTriangle::RenderFrameDoneSignal, this, &SmlGLWindowTriangle::on_timeout);
 }
 
-XGLWindowTriangle::~XGLWindowTriangle()
+SmlGLWindowTriangle::~SmlGLWindowTriangle()
 {
 	//FinalizeGL();
 }

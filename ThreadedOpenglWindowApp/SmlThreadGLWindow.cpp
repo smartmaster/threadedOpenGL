@@ -1,16 +1,16 @@
 #include <QtGlobal>
 
-#include "XThreadGLWindow.h"
+#include "SmlThreadGLWindow.h"
 #include <QMutexLocker>
 
 
-XThreadGLRender::XThreadGLRender(QObject* parent, XThreadGLWindow* window) :
+SmlThreadGLRender::SmlThreadGLRender(QObject* parent, SmlThreadGLWindow* window) :
 	QObject{ parent },
 	_glwin{ window }
 {
 }
 
-void XThreadGLRender::Render()
+void SmlThreadGLRender::Render()
 {
 
 	_glwin->ThreadRender();
@@ -45,7 +45,7 @@ void XThreadGLRender::Render()
 }
 
 
-void XThreadGLWindow::RequestRender()
+void SmlThreadGLWindow::RequestRender()
 {
 	//XMTLocker lockerTimeout{ &_timeoutLock, _multiThreadMode };
 
@@ -78,7 +78,7 @@ void XThreadGLWindow::RequestRender()
 	}
 
 
-	XMTLocker lockerRender{ &_renderLock, _multiThreadMode };
+	SmlMTLocker lockerRender{ &_renderLock, _multiThreadMode };
 	//_isRenerering = true;
 
 	//lockerTimeout.unlock();
@@ -108,9 +108,9 @@ static void xxxDelay()
 	}
 }
 
-void XThreadGLWindow::ThreadRender()
+void SmlThreadGLWindow::ThreadRender()
 {
-	XMTLocker lockerRender{ &_renderLock, _multiThreadMode };
+	SmlMTLocker lockerRender{ &_renderLock, _multiThreadMode };
 
 	if (_requestMode)
 	{
@@ -133,7 +133,7 @@ void XThreadGLWindow::ThreadRender()
 	emit RenderFrameDoneSignal();
 }
 
-void XThreadGLWindow::Render()
+void SmlThreadGLWindow::Render()
 {
 	if (isExposed())
 	{
@@ -153,7 +153,7 @@ void XThreadGLWindow::Render()
 }
 
 
-void XThreadGLWindow::paintEvent(QPaintEvent* ev)
+void SmlThreadGLWindow::paintEvent(QPaintEvent* ev)
 {
 	RequestRender();
 }
@@ -180,7 +180,7 @@ static void APIENTRY GLDebugPoc(
 	qDebug() << str;
 }
 
-void XThreadGLWindow::resizeEvent(QResizeEvent* ev)
+void SmlThreadGLWindow::resizeEvent(QResizeEvent* ev)
 {
 	if (_SurfaceDestroyed)
 	{
@@ -197,7 +197,7 @@ void XThreadGLWindow::resizeEvent(QResizeEvent* ev)
 
 	bool initGL = false;
 
-	XMTLocker lockerRender{ &_renderLock, _multiThreadMode };
+	SmlMTLocker lockerRender{ &_renderLock, _multiThreadMode };
 
 	//lockerTimeout.unlock();
 
@@ -253,7 +253,7 @@ void XThreadGLWindow::resizeEvent(QResizeEvent* ev)
 //
 //}
 
-bool XThreadGLWindow::event(QEvent* ev)
+bool SmlThreadGLWindow::event(QEvent* ev)
 {
 	QEvent::Type et = ev->type();
 
@@ -292,9 +292,9 @@ bool XThreadGLWindow::event(QEvent* ev)
 	return XQTBase::event(ev);
 }
 
-void XThreadGLWindow::FinalizeGL()
+void SmlThreadGLWindow::FinalizeGL()
 {
-	XMTLocker lockerRender{ &_renderLock, _multiThreadMode };
+	SmlMTLocker lockerRender{ &_renderLock, _multiThreadMode };
 
 	if (_glctx)
 	{
@@ -312,14 +312,14 @@ void XThreadGLWindow::FinalizeGL()
 	}
 }
 
-bool XThreadGLWindow::MakeCurrentCtx(const char* msg, const char* msg1)
+bool SmlThreadGLWindow::MakeCurrentCtx(const char* msg, const char* msg1)
 {
 	bool ok = _glctx->makeCurrent(this);
 	Q_ASSERT_X(ok && _glctx->isValid(), msg, msg1);
 	return ok;
 }
 
-void XThreadGLWindow::DoneCurrentCtx()
+void SmlThreadGLWindow::DoneCurrentCtx()
 {
 	if (_multiThreadMode) //required for multi threaded mode rendering
 	{
@@ -328,7 +328,7 @@ void XThreadGLWindow::DoneCurrentCtx()
 
 }
 
-void XThreadGLWindow::RequestCtx()
+void SmlThreadGLWindow::RequestCtx()
 {
 	//must be protected by QMutexLocker<QMutex> locker{ &_renderLock };
 	emit RequestCtxSignal();
@@ -340,9 +340,9 @@ void XThreadGLWindow::RequestCtx()
 	_ctxAcquired = false;
 }
 
-void XThreadGLWindow::ResponseCtx()
+void SmlThreadGLWindow::ResponseCtx()
 {
-	XMTLocker locker{ &_renderLock, _multiThreadMode };
+	SmlMTLocker locker{ &_renderLock, _multiThreadMode };
 	_glctx->moveToThread(_thread);
 	_ctxAcquired = true;
 	locker.unlock();
@@ -368,23 +368,23 @@ void XThreadGLWindow::ResponseCtx()
 //	return _render;
 //}
 
-void XThreadGLWindow::SetAnimating(bool run)
+void SmlThreadGLWindow::SetAnimating(bool run)
 {
 	_animating = run;
 	if (_animating)
 	{
 		//connect(_render, &XThreadGLRender::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
-		connect(this, &XThreadGLWindow::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
+		connect(this, &SmlThreadGLWindow::RenderFrameDoneSignal, this, &SmlThreadGLWindow::requestUpdate);
 		requestUpdate();
 	}
 	else
 	{
 		//disconnect(_render, &XThreadGLRender::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
-		disconnect(this, &XThreadGLWindow::RenderFrameDoneSignal, this, &XThreadGLWindow::requestUpdate);
+		disconnect(this, &SmlThreadGLWindow::RenderFrameDoneSignal, this, &SmlThreadGLWindow::requestUpdate);
 	}
 }
 
-XThreadGLWindow::XThreadGLWindow(QWindow* parent, bool requestMode /*= false*/, bool multiThreadMode /*= true*/)
+SmlThreadGLWindow::SmlThreadGLWindow(QWindow* parent, bool requestMode /*= false*/, bool multiThreadMode /*= true*/)
 	: QWindow(parent),
 	_requestMode{ requestMode },
 	_multiThreadMode{ multiThreadMode }
@@ -394,22 +394,22 @@ XThreadGLWindow::XThreadGLWindow(QWindow* parent, bool requestMode /*= false*/, 
 	if (_multiThreadMode)
 	{
 		_thread = new QThread{ this };
-		_render = new XThreadGLRender{ nullptr, this };
+		_render = new SmlThreadGLRender{ nullptr, this };
 		_render->moveToThread(_thread);
 
 		connect(_thread, &QThread::finished, _render, &QObject::deleteLater);
-		connect(this, &XThreadGLWindow::RequestRenderSignal, _render, &XThreadGLRender::Render);
+		connect(this, &SmlThreadGLWindow::RequestRenderSignal, _render, &SmlThreadGLRender::Render);
 
 		if (_requestMode)
 		{
-			connect(this, &XThreadGLWindow::RequestCtxSignal, this, &XThreadGLWindow::ResponseCtx);
+			connect(this, &SmlThreadGLWindow::RequestCtxSignal, this, &SmlThreadGLWindow::ResponseCtx);
 		}
 
 		_thread->start();
 	}
 }
 
-XThreadGLWindow::~XThreadGLWindow()
+SmlThreadGLWindow::~SmlThreadGLWindow()
 {
 	if (_multiThreadMode)
 	{

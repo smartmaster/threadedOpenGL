@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E9AC37CF-DBAE-4C38-9A83-C2AFB92D4DF5}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.22000.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -61,6 +61,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>e:\sss-dev\glm-master;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -90,24 +92,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="XWaitObject.cpp" />
-    <ClCompile Include="XGLWindowTriangle.cpp" />
-    <ClCompile Include="XSurfaceFormat.cpp" />
-    <ClCompile Include="XThreadGLWindow.cpp" />
+    <ClCompile Include="SmlWaitObject.cpp" />
+    <ClCompile Include="SmlGLWindowTriangle.cpp" />
+    <ClCompile Include="SmlSurfaceFormat.cpp" />
+    <ClCompile Include="SmlThreadGLWindow.cpp" />
     <QtRcc Include="ThreadedOpenglWindowApp.qrc" />
     <QtUic Include="ThreadedOpenglWindowApp.ui" />
-    <QtMoc Include="ThreadedOpenglWindowApp.h" />
-    <ClCompile Include="ThreadedOpenglWindowApp.cpp" />
+    <QtMoc Include="SmlThreadedOpenglMainWindow.h" />
+    <ClCompile Include="SmlThreadedOpenglMainWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="XThreadGLWindow.h" />
+    <QtMoc Include="SmlThreadGLWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="XGLWindowTriangle.h" />
-    <ClInclude Include="SMLCoordSystem.h" />
-    <ClInclude Include="XWaitObject.h" />
-    <ClInclude Include="XSurfaceFormat.h" />
+    <QtMoc Include="SmlGLWindowTriangle.h" />
+    <ClInclude Include="SmlAxisCoord.h" />
+    <ClInclude Include="SmlAxisCoord.test.h" />
+    <ClInclude Include="SmlWaitObject.h" />
+    <ClInclude Include="SmlSurfaceFormat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

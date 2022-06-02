@@ -3,7 +3,7 @@
 #include <QSurfaceFormat>
 
 
-class XSurfaceFormatUtils 
+class SmlSurfaceFormatUtils 
 {
 public:
 	static void SurfaceFormat();

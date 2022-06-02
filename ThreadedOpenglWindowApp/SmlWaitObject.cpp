@@ -1,17 +1,17 @@
-#include "XWaitObject.h"
+#include "SmlWaitObject.h"
 
 #include <QMutexLocker>
 #include <QWaitCondition>
 #include <QMutex>
 
 
-XEvent::XEvent(bool busy) :
+SmlEvent::SmlEvent(bool busy) :
 	_busy(busy)
 {
 
 }
 
-bool XEvent::Wait(uint timeout)
+bool SmlEvent::Wait(uint timeout)
 {
 	bool waitok = true;
 	QMutexLocker<QMutex> locker{&_mutex};
@@ -33,7 +33,7 @@ bool XEvent::Wait(uint timeout)
 	return waitok;
 }
 
-void XEvent::Notify(bool all)
+void SmlEvent::Notify(bool all)
 {
 	QMutexLocker<QMutex> locker{ &_mutex };
 	_busy = false;
@@ -50,13 +50,13 @@ void XEvent::Notify(bool all)
 	
 }
 
-XSemphore::XSemphore(int counter) :
+SmlSemphore::SmlSemphore(int counter) :
 	_couter{counter}
 {
 
 }
 
-bool XSemphore::Wait(uint timeout)
+bool SmlSemphore::Wait(uint timeout)
 {
 	bool waitok = true;
 
@@ -79,7 +79,7 @@ bool XSemphore::Wait(uint timeout)
 	return waitok;
 }
 
-void XSemphore::Notify(bool all)
+void SmlSemphore::Notify(bool all)
 {
 	QMutexLocker<QMutex> locker{ &_mutex };
 	++_couter;

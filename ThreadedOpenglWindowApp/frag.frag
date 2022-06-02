@@ -10,5 +10,7 @@ void main(void)
 {
     //gl_FragColor = vertColor;
     //finalColor = vertColor;
-    finalColor = texture(tex, textCoordV);
+    const float ratio = 0.0;
+    finalColor =(1.0f - ratio) * texture(tex, textCoordV) + ratio*vertColor;
+    //finalColor = clamp(finalColor, ve, )
 }

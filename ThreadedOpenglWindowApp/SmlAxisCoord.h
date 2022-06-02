@@ -9,7 +9,7 @@
 namespace SmartLib
 {
 template<typename T = double>
-class CoordSystem
+class AxisCoord
 {
 private:
     inline static const glm::tmat4x4<T> MatIdentity{T{1}};
@@ -33,25 +33,25 @@ public:
 
 public:
 
-    CoordSystem()
+    AxisCoord()
     {
     }
 
-    CoordSystem(const CoordSystem& as) :
+    AxisCoord(const AxisCoord& as) :
         _axis{as._axis},
         _unitLen{as._unitLen},
         _origin{as._origin}
     {
     }
 
-    CoordSystem(CoordSystem&& as) :
+    AxisCoord(AxisCoord&& as) :
         _axis{std::move(as._axis)},
         _unitLen{std::move(as._unitLen)},
         _origin{std::move(as._origin)}
     {
     }
 
-    const CoordSystem& operator=(const CoordSystem& as)
+    const AxisCoord& operator=(const AxisCoord& as)
     {
         _axis = as._axis;
         _unitLen = as._unitLen;
@@ -59,7 +59,7 @@ public:
         return *this;
     }
 
-    const CoordSystem& operator=(CoordSystem&& as)
+    const AxisCoord& operator=(AxisCoord&& as)
     {
         _axis = std::move(as._axis);
         _unitLen = std::move(as._unitLen);
@@ -67,7 +67,7 @@ public:
         return *this;
     }
 
-    CoordSystem& Reset()
+    AxisCoord& Reset()
     {
         _axis = MatIdentity;
         _unitLen = VecAllOne;
@@ -78,21 +78,21 @@ public:
 
 
     //move along the current axis directions and with the current unit length
-    CoordSystem& Translate(const glm::tvec3<T>& offset)
+    AxisCoord& Translate(const glm::tvec3<T>& offset)
     {
         _origin += M4xP3(_axis, offset * _unitLen);
         return *this;
     }
 
     //move along the absolute (world) axis directions
-    CoordSystem& TranslateAbsolutely(const glm::tvec3<T>& offsetAbsolutely)
+    AxisCoord& TranslateAbsolutely(const glm::tvec3<T>& offsetAbsolutely)
     {
         _origin += offsetAbsolutely;
         return *this;
     }
 
     //rotate in current coordinates system
-    CoordSystem& Rotate(T radians, const glm::tvec3<T>& rotAxis)
+    AxisCoord& Rotate(T radians, const glm::tvec3<T>& rotAxis)
     {
         auto rotAxisAbsolutely = M4xV3(_axis, rotAxis);
         _axis = glm::rotate<T>(MatIdentity, radians, rotAxisAbsolutely) * _axis;
@@ -101,7 +101,7 @@ public:
 
 
     //rotate in absolute (world) coordinates system
-    CoordSystem& RotateAbsolutely(T radians, const glm::tvec3<T>& rotAxisAbsolutely)
+    AxisCoord& RotateAbsolutely(T radians, const glm::tvec3<T>& rotAxisAbsolutely)
     {
         _axis = glm::rotate<T>(MatIdentity, radians, rotAxisAbsolutely) * _axis;
         return *this;
@@ -109,28 +109,28 @@ public:
 
 
     //scale in current coordinates system
-    CoordSystem& Scale(const glm::tvec3<T>& scalar)
+    AxisCoord& Scale(const glm::tvec3<T>& scalar)
     {
         _unitLen *= scalar;
         return *this;
     }
 
 
-    CoordSystem& ScaleAbsolutely(const glm::tvec3<T>& scalar)
+    AxisCoord& ScaleAbsolutely(const glm::tvec3<T>& scalar)
     {
         _unitLen = scalar;
         return *this;
     }
 
 
-    CoordSystem& SetOrigin(const glm::tvec3<T>& origin)
+    AxisCoord& SetOrigin(const glm::tvec3<T>& origin)
     {
         _origin = origin;
         return *this;
     }
 
     //axis should be unit and orthogonal matrix
-    CoordSystem& SetAxis(const glm::tmat4x4<T>& axis)
+    AxisCoord& SetAxis(const glm::tmat4x4<T>& axis)
     {
         _axis = axis;
         return *this;
@@ -272,7 +272,7 @@ public:
         auto xAxis = glm::cross(up, zAxis);
         auto yAxis = glm::cross(zAxis, xAxis);
 
-        CoordSystem<T> axisSys;
+        AxisCoord<T> axisSys;
         axisSys.MakeFromOHVZ(eye, xAxis, yAxis, zAxis);
 
         return axisSys.WorldToModelMat();
@@ -280,55 +280,92 @@ public:
 
     //equivilent to glm::ortho
     static glm::tmat4x4<T> Ortho(
-            T const &left, T const &right,
-            T const &bottom, T const &top,
-            T const &zNear, T const &zFar
+            T const left, T const right,
+            T const bottom, T const top,
+            T const zNear, T const zFar
             )
     {
-        //////////////////////////////////////
-        CoordSystem<T> axisSys;
+#if 0
+		//////////////////////////////////////
+		AxisCoord<T> axisSys;
 
-        axisSys.Scale(glm::tvec3<T>{T{1}, T{1}, T{-1}})
-                .Translate(glm::tvec3<T>{(left + right)/T{2}, (bottom + top)/T{2}, (zNear + zFar)/T{2}})
-                .Scale(glm::tvec3<T>{(right - left)/T{2}, (top - bottom)/T{2}, (zFar - zNear)/T{2}});
+		axisSys.Scale(glm::tvec3<T>{T{ 1 }, T{ 1 }, T{ -1 }})
+			.Translate(glm::tvec3<T>{(left + right) / T{ 2 }, (bottom + top) / T{ 2 }, (zNear + zFar) / T{ 2 }})
+			.Scale(glm::tvec3<T>{(right - left) / T{ 2 }, (top - bottom) / T{ 2 }, (zFar - zNear) / T{ 2 }});
+
+		auto mat = axisSys.WorldToModelMat();
+
+		return mat;
+
+#else
+        AxisCoord<T> axisSys;
+        axisSys
+            .Translate(glm::tvec3<T>{(left + right) / T{ 2 }, (bottom + top) / T{ 2 }, (zNear + zFar) / T{ 2 }})
+            .Scale(glm::tvec3<T>{(right - left) / T{ 2 }, (top - bottom) / T{ 2 }, (zNear - zFar) / T{ 2 }});
 
         auto mat = axisSys.WorldToModelMat();
-
         return mat;
-
+#endif
     }
 
 
 
 
     static glm::tmat4x4<T> Frustum(
-            T const &left, T const &right,
-            T const &bottom, T const &top,
-            T const &zNear, T const &zFar
+            T const left, T const right,
+            T const bottom, T const top,
+            T const zNear, T const zFar
             )
     {
-        //////////////////////////////////////
 
-        //frustum to cubic
-        T A = -zNear  - zFar;
-        T B = -zNear*zFar;
-        glm::tmat4x4<T> matFrustum2Cubic
-        {
-                  -zNear, 0, 0, 0,
-                  0, -zNear, 0, 0,
-                  0, 0, A, 1,
-                  0, 0, B, 0,
-        };
+#if 0
+		//////////////////////////////////////
 
-        //cubic to NDC
-        glm::tmat4x4<T> matOrtho = Ortho(
-                    left, right,
-                    bottom, top,
-                    zNear, zFar);
+		//frustum to cubic
+		T A = -zNear - zFar;
+		T B = -zNear * zFar;
+		glm::tmat4x4<T> matFrustum2Cubic
+		{
+				  -zNear, 0, 0, 0,
+				  0, -zNear, 0, 0,
+				  0, 0, A, 1,
+				  0, 0, B, 0,
+		};
 
-        glm::tmat4x4<T> rv = matOrtho * matFrustum2Cubic;
+		//cubic to NDC
+		glm::tmat4x4<T> matOrtho = Ortho(
+			left, right,
+			bottom, top,
+			zNear, zFar);
 
-        return -rv;
+		glm::tmat4x4<T> rv = matOrtho * matFrustum2Cubic;
+
+		return -rv;
+#else
+		//////////////////////////////////////
+
+		//frustum to cubic
+		T A = zNear + zFar;
+		T B = - zNear * zFar;
+		glm::tmat4x4<T> matFrustum2Cubic
+		{
+				  zNear, 0, 0, 0,
+				  0, zNear, 0, 0,
+				  0, 0, A, 1,
+				  0, 0, B, 0,
+		};
+
+		//cubic to NDC
+		glm::tmat4x4<T> matOrtho = Ortho(
+			left, right,
+			bottom, top,
+			zNear, zFar);
+
+		glm::tmat4x4<T> rv = matOrtho * matFrustum2Cubic;
+
+		return -rv;
+#endif
+        
     }
 
 

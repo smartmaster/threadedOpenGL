@@ -13,18 +13,18 @@
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
-#include "XWaitObject.h"
+#include "SmlWaitObject.h"
 
-class XThreadGLWindow;
-class XThreadGLRender : public QObject
+class SmlThreadGLWindow;
+class SmlThreadGLRender : public QObject
 {
 	Q_OBJECT
 
 private:
-	XThreadGLWindow* _glwin{ nullptr };
+	SmlThreadGLWindow* _glwin{ nullptr };
 
 public:
-	XThreadGLRender(QObject* parent, XThreadGLWindow* window);
+	SmlThreadGLRender(QObject* parent, SmlThreadGLWindow* window);
 
 public slots:
 	void Render();
@@ -34,12 +34,12 @@ public slots:
 
 };
 
-class XThreadGLWindow : public QWindow, protected QOpenGLFunctions_4_5_Core
+class SmlThreadGLWindow : public QWindow, protected QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
 
 private:
-	friend class XThreadGLRender;
+	friend class SmlThreadGLRender;
 	using XQTBase = QWindow;
 
 private:
@@ -55,11 +55,11 @@ private:
 	
 	QMutex _renderLock;
 	QThread* _thread{nullptr};
-	XThreadGLRender* _render{ nullptr };
+	SmlThreadGLRender* _render{ nullptr };
 
 	//QMutex _timeoutLock;
 	//QWaitCondition _condTimeout;
-	XEvent _eventRenderDone{false};
+	SmlEvent _eventRenderDone{false};
 	//XSemphore _event{ 1 };
 
 	bool _requestMode{ false };
@@ -110,6 +110,6 @@ public:
 	void SetAnimating(bool run);
 
 public:
-	XThreadGLWindow(QWindow* parent, bool requestMode = false, bool multiThreadMode = true);
-	virtual ~XThreadGLWindow();
+	SmlThreadGLWindow(QWindow* parent, bool requestMode = false, bool multiThreadMode = true);
+	virtual ~SmlThreadGLWindow();
 };

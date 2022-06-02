@@ -1,17 +1,17 @@
 #pragma once
 
 #include <QObject>
-#include "XThreadGLWindow.h"
+#include "SmlThreadGLWindow.h"
 
 #include <glm/glm.hpp>
-#include "SMLCoordSystem.h"
+#include "SmlAxisCoord.h"
 
-class XGLWindowTriangle : public XThreadGLWindow
+class SmlGLWindowTriangle : public SmlThreadGLWindow
 {
 	Q_OBJECT
 
 private:
-	using XQTBase = XThreadGLWindow;
+	using XQTBase = SmlThreadGLWindow;
 
 private:
 	bool _isAnimating{ false };
@@ -56,8 +56,8 @@ private:
 	inline static constexpr int texCoordLocation = 2;
 
 
-	SmartLib::CoordSystem<float> _axisModel;
-	SmartLib::CoordSystem<float> _axisEye;
+	SmartLib::AxisCoord<float> _axisModel;
+	SmartLib::AxisCoord<float> _axisEye;
 	glm::mat4 _frustum;
 
 
@@ -79,6 +79,6 @@ private:
 	//void ResetEye();
 
 public:
-	XGLWindowTriangle(QWindow *parent);
-	virtual ~XGLWindowTriangle() override;
+	SmlGLWindowTriangle(QWindow *parent);
+	virtual ~SmlGLWindowTriangle() override;
 };

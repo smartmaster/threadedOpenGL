@@ -1,6 +1,6 @@
-#include "XSurfaceFormat.h"
+#include "SmlSurfaceFormat.h"
 
-void XSurfaceFormatUtils::SurfaceFormat()
+void SmlSurfaceFormatUtils::SurfaceFormat()
 {
 	QSurfaceFormat defaultFormat;
 	defaultFormat.setVersion(4, 5);

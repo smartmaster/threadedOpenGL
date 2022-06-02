@@ -1,13 +1,13 @@
-#include "ThreadedOpenglWindowApp.h"
+#include "SmlThreadedOpenglMainWindow.h"
 #include <QtWidgets/QApplication>
-#include "XSurfaceFormat.h"
+#include "SmlSurfaceFormat.h"
 
 int main(int argc, char *argv[])
 {
-    XSurfaceFormatUtils::SurfaceFormat();
+    SmlSurfaceFormatUtils::SurfaceFormat();
 
     QApplication a(argc, argv);
-    ThreadedOpenglWindowApp w;
+    SmlThreadedOpenglMainWindow w;
     w.show();
     return a.exec();
 }

@@ -4,12 +4,16 @@
 #include "ui_ThreadedOpenglWindowApp.h"
 #include <QWindow>
 
-class ThreadedOpenglWindowApp : public QMainWindow
+class SmlThreadedOpenglMainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    ThreadedOpenglWindowApp(QWidget *parent = Q_NULLPTR);
+    SmlThreadedOpenglMainWindow(QWidget *parent = Q_NULLPTR);
+
+
+public slots:
+    void OnPushButtonTestOthoClicked();
 
 private:
     Ui::ThreadedOpenglWindowAppClass ui;

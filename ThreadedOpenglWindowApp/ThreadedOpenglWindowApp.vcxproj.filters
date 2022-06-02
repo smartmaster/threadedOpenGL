@@ -29,10 +29,10 @@
     <QtUic Include="ThreadedOpenglWindowApp.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="ThreadedOpenglWindowApp.h">
+    <QtMoc Include="SmlThreadedOpenglMainWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="ThreadedOpenglWindowApp.cpp">
+    <ClCompile Include="SmlThreadedOpenglMainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -40,35 +40,38 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XThreadGLWindow.cpp">
+    <ClCompile Include="SmlThreadGLWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XSurfaceFormat.cpp">
+    <ClCompile Include="SmlSurfaceFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XGLWindowTriangle.cpp">
+    <ClCompile Include="SmlGLWindowTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XWaitObject.cpp">
+    <ClCompile Include="SmlWaitObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="XThreadGLWindow.h">
+    <QtMoc Include="SmlThreadGLWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="XGLWindowTriangle.h">
+    <QtMoc Include="SmlGLWindowTriangle.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="XSurfaceFormat.h">
+    <ClInclude Include="SmlSurfaceFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SMLCoordSystem.h">
+    <ClInclude Include="SmlAxisCoord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XWaitObject.h">
+    <ClInclude Include="SmlWaitObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SmlAxisCoord.test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

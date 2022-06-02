@@ -4,7 +4,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-class XEvent final
+class SmlEvent final
 {
 private:
 	volatile bool _busy{ false };
@@ -12,13 +12,13 @@ private:
 	QWaitCondition _cond;
 
 public:
-	XEvent(bool busy);
+	SmlEvent(bool busy);
 	bool Wait(uint timeout);
 	void Notify(bool all);
 };
 
 
-class XSemphore final
+class SmlSemphore final
 {
 private:
 	volatile int _couter{ 0 };
@@ -26,20 +26,20 @@ private:
 	QWaitCondition _cond;
 
 public:
-	XSemphore(int counter);
+	SmlSemphore(int counter);
 	bool Wait(uint timeout);
 	void Notify(bool all);
 };
 
 
 template<typename TMUTEX>
-class XMTLocker
+class SmlMTLocker
 {
 private:
 	bool _locked{ false };
 	TMUTEX* _mtx{ nullptr };
 public:
-	XMTLocker(TMUTEX* mtx, bool mt) :
+	SmlMTLocker(TMUTEX* mtx, bool mt) :
 		_mtx{ mtx }
 	{
 		if (mt && _mtx)
@@ -59,7 +59,7 @@ public:
 		}
 	}
 
-	~XMTLocker()
+	~SmlMTLocker()
 	{
 		unlock();
 	}
