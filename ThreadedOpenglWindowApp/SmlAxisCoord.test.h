@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <QDebug>
 #include <glm/gtx/string_cast.hpp>
 
 
@@ -40,8 +41,8 @@ namespace SmartLib
 			auto str1 = glm::to_string(mat1);
 			auto str2 = glm::to_string(mat2);
 
-			cout << str1 << endl;
-			cout << str2 << endl << endl;
+			qDebug() << str1.c_str() << Qt::endl;
+			qDebug() << str2.c_str() << Qt::endl << Qt::endl;
 
 			bool ok = true;
 			for (int ii = 0; ii < mat1.length(); ++ii)
@@ -62,11 +63,11 @@ namespace SmartLib
 		{
 			using T = double;
 
-			const size_t dataSize = 1000;
+			const size_t dataSize = 10000;
 			vector<T> data(dataSize);
-			FillRandom(data.begin(), data.end(), 0.01, -9999, 9999, 0);
+			FillRandom(data.begin(), data.end(), 0.001, -99999, 99999, 0);
 
-			const int loopCount = 100;
+			const int loopCount = 20000;
 			int index = 0;
 			for (int ii = 0; ii < loopCount; ++ii)
 			{
@@ -77,10 +78,19 @@ namespace SmartLib
 				T znear = data[index % dataSize]; ++index;
 				T zfar = data[index % dataSize]; ++index;
 
-				auto mat = AxisCoord<T>::Ortho(left, right, bottom, top, znear, zfar);
-				auto matGlm = glm::ortho(left, right, bottom, top, znear, zfar);
-				const T eps = 1e-5;
-				assert(CompareMat4(mat, matGlm, eps));
+				{
+					auto mat = AxisCoord<T>::Ortho(left, right, bottom, top, znear, zfar);
+					auto matGlm = glm::ortho(left, right, bottom, top, znear, zfar);
+					const T eps = 1e-5;
+					assert(CompareMat4(mat, matGlm, eps));
+				}
+				{
+					auto mat = AxisCoord<T>::Frustum(left, right, bottom, top, znear, zfar);
+					auto matGlm = glm::frustum(left, right, bottom, top, znear, zfar);
+					const T eps = 1e-5;
+					assert(CompareMat4(mat, matGlm, eps));
+				}
+
 			}
 		}
 	};

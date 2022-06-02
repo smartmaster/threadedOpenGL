@@ -300,7 +300,7 @@ public:
 #else
         AxisCoord<T> axisSys;
         axisSys
-            .Translate(glm::tvec3<T>{(left + right) / T{ 2 }, (bottom + top) / T{ 2 }, (zNear + zFar) / T{ 2 }})
+            .Translate(glm::tvec3<T>{(left + right) / T{ 2 }, (bottom + top) / T{ 2 }, -(zNear + zFar) / T{ 2 }})
             .Scale(glm::tvec3<T>{(right - left) / T{ 2 }, (top - bottom) / T{ 2 }, (zNear - zFar) / T{ 2 }});
 
         auto mat = axisSys.WorldToModelMat();
@@ -351,8 +351,8 @@ public:
 		{
 				  zNear, 0, 0, 0,
 				  0, zNear, 0, 0,
-				  0, 0, A, 1,
-				  0, 0, B, 0,
+				  0, 0, A, -1,
+				  0, 0, -B, 0,
 		};
 
 		//cubic to NDC
@@ -362,8 +362,7 @@ public:
 			zNear, zFar);
 
 		glm::tmat4x4<T> rv = matOrtho * matFrustum2Cubic;
-
-		return -rv;
+		return rv;
 #endif
         
     }
